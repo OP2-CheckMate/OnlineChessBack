@@ -1,6 +1,6 @@
 # OnlineChessBack
 
-## Running SW: ## 
+## Running the program, install packages: ## 
 npm install
 # Run development version that refreshes when changes are made
 npm run dev
