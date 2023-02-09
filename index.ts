@@ -2,6 +2,7 @@
 //For some reason API fetches for drones and pilots actually return data
 
 import { Response } from "express";
+import routes from './routes/index';
 
 const express = require('express');
 const app = express();
@@ -27,11 +28,8 @@ app.listen(PORT, () => {
 
 // #############    ACTIONS     ##############
 
-interface player{
-    id: number;
-}
-let queue: player[] = []
-let currentId = 0
+//use routes FOLDER with prefix /api
+app.use('/api', routes)
 
 //Index
 app.get('/', (req: Request, res: Response) => {
@@ -45,8 +43,15 @@ app.get('/jsontest', (req: Request, res: Response, err: Error) => {
     })
 });
 
+interface player{
+    id: number;
+}
+let queue: player[] = []
+let currentId = 0
+
+//xxxx/api/queuing/findgame
 //Join queue
-app.get('/findgame', (req: Request, res: Response, err: Error) => {
+app.get('/findgame', (req: Request, res: Response, err: Error): any => {
 
     const PLAYERQUEUING: player = {
         id: currentId
