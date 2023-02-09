@@ -25,12 +25,34 @@ app.listen(PORT, () => {
     console.log(`App is running on port ${ PORT }`);
 });
 
+// #############    ACTIONS     ##############
+
+interface player{
+    id: number;
+}
+let queue: player[] = []
+let currentId = 0
+
+//Index
 app.get('/', (req: Request, res: Response) => {
     res.send('Express + TypeScript Server for online mobile chess');
 });
 
+//Test json return
 app.get('/jsontest', (req: Request, res: Response, err: Error) => {
     return res.json({
         "testSuccess" : true
     })
+});
+
+//Join queue
+app.get('/findgame', (req: Request, res: Response, err: Error) => {
+
+    const PLAYERQUEUING: player = {
+        id: currentId
+    }
+    queue.push(PLAYERQUEUING)
+    currentId ++
+    
+    return res.json(PLAYERQUEUING)
 });
