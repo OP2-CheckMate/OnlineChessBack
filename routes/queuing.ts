@@ -12,7 +12,7 @@ let currentId = 0 //Current userID, distributes "guest ids"
 
 //xxxx/api/queuing/findgame
 //Join queue
-queuing.get('/findgame', (req: Request, res: Response, err: Error): any => {
+queuing.get('/findgame', (req: Request, res: Response, err: Error) => {
 
     const PLAYERQUEUING: player = {
         id: currentId,
