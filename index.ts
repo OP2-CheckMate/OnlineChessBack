@@ -1,7 +1,7 @@
 //Simple REST service made with Express
 //For some reason API fetches for drones and pilots actually return data
 
-import { Response } from "express";
+import { Request, Response } from "express";
 import routes from './routes/index';
 
 const express = require('express');
@@ -41,23 +41,4 @@ app.get('/jsontest', (req: Request, res: Response, err: Error) => {
     return res.json({
         "testSuccess" : true
     })
-});
-
-interface player{
-    id: number;
-}
-let queue: player[] = []
-let currentId = 0
-
-//xxxx/api/queuing/findgame
-//Join queue
-app.get('/findgame', (req: Request, res: Response, err: Error): any => {
-
-    const PLAYERQUEUING: player = {
-        id: currentId
-    }
-    queue.push(PLAYERQUEUING)
-    currentId ++
-    
-    return res.json(PLAYERQUEUING)
 });

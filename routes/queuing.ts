@@ -1,5 +1,5 @@
 const express = require('express')
-
+import { Request, Response } from "express";
 const queuing = express.Router()
 queuing.use(express.json())
 
