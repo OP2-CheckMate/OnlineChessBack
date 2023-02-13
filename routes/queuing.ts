@@ -4,8 +4,7 @@ const queuing = express.Router()
 queuing.use(express.json())
 import {Player, Lobby} from '../types/types'
 
-
-
+//PLAYER HANDLING
 let queue: Player[] = [] //All players looking to play
 let currentPlayerId = 0 //Current userID, distributes "guest ids"
 
@@ -61,7 +60,8 @@ queuing.post('/joinlobby', (req: Request, res: Response, err: Error) => {
 
     //Find correct lobby based on id
     const LOBBY = lobbies.find((lobby) => lobby.lobbyId === LOBBYID)
-    if (LOBBY != undefined) LOBBY.player2 = {id: currentPlayerId, name: PLAYERNAME}
+    const NOT_FOUND = undefined
+    if (LOBBY != NOT_FOUND) LOBBY.player2 = {id: currentPlayerId, name: PLAYERNAME}
     else return res.status(400).json({message: 'Lobby does not exist'})
 
     return res.json(LOBBY)
