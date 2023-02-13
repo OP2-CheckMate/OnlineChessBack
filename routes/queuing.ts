@@ -24,4 +24,20 @@ queuing.get('/findgame', (req: Request, res: Response, err: Error) => {
     return res.json(PLAYERQUEUING)
 });
 
+queuing.post('/findgame', (req: Request, res: Response, err: Error) => {
+
+    const PLAYERNAME: string = req.body.name
+    const PLAYERQUEUING: player = {
+        id: currentId,
+        name: PLAYERNAME
+    }
+    queue.push(PLAYERQUEUING)
+    currentId ++
+
+    console.log('QUEUE:')
+    console.log(queue)
+    
+    return res.json(PLAYERQUEUING)
+});
+
 export default queuing
