@@ -15,6 +15,7 @@ let currentLobbyId = 1000
 
 //xxxx/api/queuing/findgame, body: {name: "xxx"}
 //Join queue
+//###################### NOT IN USE ######################
 queuing.post('/findgame', (req: Request, res: Response, err: Error) => {
 
     const PLAYERNAME: string = req.body.name
@@ -32,7 +33,7 @@ queuing.post('/findgame', (req: Request, res: Response, err: Error) => {
     return res.json(PLAYERQUEUING)
 });
 
-//xxxx/api/queuing/createlobby, body: {name: "xxx"}
+//xxxx/api/queuing/createlobby, body: { name: "xxx" }
 //Join queue
 queuing.post('/createlobby', (req: Request, res: Response, err: Error) => {
 
@@ -51,15 +52,17 @@ queuing.post('/createlobby', (req: Request, res: Response, err: Error) => {
     return res.json(LOBBY)
 });
 
+//xxxx/api/queuing/joinlobby, body: { lobbyId: 0000, name: "xxx" }
+//JOIN already created lobby
 queuing.post('/joinlobby', (req: Request, res: Response, err: Error) => {
 
     const PLAYERNAME: string = req.body.name
     const LOBBYID: number = req.body.lobbyId
 
+    //Find correct lobby based on id
     const LOBBY = lobbies.find((lobby) => lobby.lobbyId === LOBBYID)
     if (LOBBY != undefined) LOBBY.player2 = {id: currentPlayerId, name: PLAYERNAME}
-
-    console.log(LOBBY)
+    else return res.status(400).json({message: 'Lobby does not exist'})
 
     return res.json(LOBBY)
 });
