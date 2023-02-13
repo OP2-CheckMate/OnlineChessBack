@@ -46,6 +46,7 @@ queuing.post('/createlobby', (req: Request, res: Response, err: Error) => {
 
     lobbies.push(LOBBY)
     currentLobbyId++
+    currentPlayerId++
     
     return res.json(LOBBY)
 });
