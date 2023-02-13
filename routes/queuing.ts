@@ -2,42 +2,47 @@ const express = require('express')
 import { Request, Response } from "express";
 const queuing = express.Router()
 queuing.use(express.json())
+import {Player, Lobby} from '../types/types'
 
-interface player{
-    id: number;
-    name: string;
-}
-let queue: player[] = [] //All players looking to play
-let currentId = 0 //Current userID, distributes "guest ids"
 
-//xxxx/api/queuing/findgame
+
+let queue: Player[] = [] //All players looking to play
+let currentPlayerId = 0 //Current userID, distributes "guest ids"
+
+//GAMES AND LOBBIES
+let lobbies: Lobby[] = []
+let currentLobbyId = 1000
+
+//xxxx/api/queuing/findgame, body: {name: "xxx"}
 //Join queue
-queuing.get('/findgame', (req: Request, res: Response, err: Error) => {
-
-    const PLAYERQUEUING: player = {
-        id: currentId,
-        name: "Guest-" + currentId
-    }
-    queue.push(PLAYERQUEUING)
-    currentId ++
-    
-    return res.json(PLAYERQUEUING)
-});
-
 queuing.post('/findgame', (req: Request, res: Response, err: Error) => {
 
     const PLAYERNAME: string = req.body.name
-    const PLAYERQUEUING: player = {
-        id: currentId,
+    const PLAYERQUEUING: Player = {
+        id: currentPlayerId,
         name: PLAYERNAME
     }
+
     queue.push(PLAYERQUEUING)
-    currentId ++
+    currentPlayerId ++
 
     console.log('QUEUE:')
-    console.log(queue)
-    
+    console.table(queue)
+
     return res.json(PLAYERQUEUING)
+});
+
+queuing.post('/createlobby', (req: Request, res: Response, err: Error) => {
+
+    const PLAYERNAME: string = req.body.name
+    const PLAYER1: Player = {id: currentPlayerId, name: PLAYERNAME}
+    
+    const lobby: Lobby = {
+        lobbyId: currentLobbyId,
+        player1: PLAYER1,
+    }
+    
+    return res.json(lobby)
 });
 
 export default queuing
