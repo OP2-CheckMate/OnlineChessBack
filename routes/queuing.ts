@@ -32,17 +32,35 @@ queuing.post('/findgame', (req: Request, res: Response, err: Error) => {
     return res.json(PLAYERQUEUING)
 });
 
+//xxxx/api/queuing/createlobby, body: {name: "xxx"}
+//Join queue
 queuing.post('/createlobby', (req: Request, res: Response, err: Error) => {
 
     const PLAYERNAME: string = req.body.name
     const PLAYER1: Player = {id: currentPlayerId, name: PLAYERNAME}
     
-    const lobby: Lobby = {
+    const LOBBY: Lobby = {
         lobbyId: currentLobbyId,
         player1: PLAYER1,
     }
+
+    lobbies.push(LOBBY)
+    currentLobbyId++
     
-    return res.json(lobby)
+    return res.json(LOBBY)
+});
+
+queuing.post('/joinlobby', (req: Request, res: Response, err: Error) => {
+
+    const PLAYERNAME: string = req.body.name
+    const LOBBYID: number = req.body.lobbyId
+
+    const LOBBY = lobbies.find((lobby) => lobby.lobbyId === LOBBYID)
+    if (LOBBY != undefined) LOBBY.player2 = {id: currentPlayerId, name: PLAYERNAME}
+
+    console.log(LOBBY)
+
+    return res.json(LOBBY)
 });
 
 export default queuing
