@@ -9,7 +9,7 @@ let queue: Player[] = [] //All players looking to play
 let currentPlayerId = 0 //Current userID, distributes "guest ids"
 
 //GAMES AND LOBBIES
-let lobbies: Lobby[] = []
+export const LOBBIES: Lobby[] = [] //trying to export this to other route to see if it updates
 let currentLobbyId = 1000
 
 //xxxx/api/queuing/findgame, body: {name: "xxx"}
@@ -44,7 +44,7 @@ queuing.post('/createlobby', (req: Request, res: Response, err: Error) => {
         player1: PLAYER1,
     }
 
-    lobbies.push(LOBBY)
+    LOBBIES.push(LOBBY)
     currentLobbyId++
     currentPlayerId++
     
@@ -59,7 +59,7 @@ queuing.post('/joinlobby', (req: Request, res: Response, err: Error) => {
     const LOBBYID: number = req.body.lobbyId
 
     //Find correct lobby based on id
-    const LOBBY = lobbies.find((lobby) => lobby.lobbyId === LOBBYID)
+    const LOBBY = LOBBIES.find((lobby) => lobby.lobbyId === LOBBYID)
     const NOT_FOUND = undefined
     if (LOBBY != NOT_FOUND) LOBBY.player2 = {id: currentPlayerId, name: PLAYERNAME}
     else return res.status(400).json({message: 'Lobby does not exist'})
