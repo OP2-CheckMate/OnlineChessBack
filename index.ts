@@ -3,6 +3,7 @@
 
 import { Request, Response } from "express";
 import routes from './routes/index';
+import logger from "./utils/logger";
 
 const express = require('express');
 const app = express();
@@ -23,7 +24,7 @@ app.use(cors());
 //Gets port from deployment server (heroku) or uses 8080
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
-    console.log(`App is running on port ${ PORT }`);
+    logger.info(`App is running on port ${ PORT }`);
 });
 
 // #############    ACTIONS     ##############
