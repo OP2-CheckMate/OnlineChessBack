@@ -7,4 +7,5 @@ export interface Lobby {
     lobbyId: number;
     player1: Player;
     player2?: Player;
+    recentMove?: string;
 }
