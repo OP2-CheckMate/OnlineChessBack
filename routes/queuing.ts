@@ -12,10 +12,11 @@ let currentPlayerId = 0 //Current userID, distributes "guest ids"
 export const LOBBIES: Lobby[] = [] //trying to export this to other route to see if it updates
 let currentLobbyId = 1000
 
-export function updateLobby(lobbyId: number, recentMove: Move) {
+export function updateLobby(lobbyId: number, recentMove: Move, gameOver: boolean) {
   const lobby = LOBBIES.find((lobby) => lobby.lobbyId === lobbyId);
   if (lobby) {
     lobby.recentMove = recentMove;
+    lobby.isGameOver = gameOver;
   }
 }
 

@@ -34,10 +34,8 @@ games.post('/lobby/:id/', (req: Request, res: Response, err: Error) => {
   } else {
     if (req.body && req.body.recentMove !== undefined) {
       const move: Move = req.body.recentMove;
-      updateLobby(parseInt(id), move);
-      if (req.body.isGameOver) {
-        return res.json({ message: 'Game over!' })
-      }
+      const gameOver: boolean = req.body.isGameOver;
+      updateLobby(parseInt(id), move, gameOver);
     } else {
       logger.error(`Move not found for id ${id}`)
       return res.json({ message: 'move not found' })
