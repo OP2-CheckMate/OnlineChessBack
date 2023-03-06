@@ -3,7 +3,6 @@ import { format, transports, createLogger } from 'winston';
 // Modifying the log line format for easier reading
 const customFormat = format.combine(
     format.timestamp({ format: "YYYYMMDD|HH:mm:ss" }),
-    // format.splat(),   // It would be possible to log also error _objects_. Not this time
     format.printf((info: any) => {
         return `${info.timestamp}|${info.level.toLocaleUpperCase()}|${info.message}`;
     }),

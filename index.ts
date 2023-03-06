@@ -8,6 +8,20 @@ import logger from "./utils/logger";
 const express = require('express');
 const app = express();
 
+// Log incoming requests
+app.use((req: Request, res: Response, next: Function) => {
+    logger.info(`${req.method} ${req.url}`);
+    next();
+});
+
+// Log outgoing responses
+app.use((req: Request, res: Response, next: Function) => {
+    res.on('finish', () => {
+        logger.info(`${res.statusCode} ${res.statusMessage}; ${res.get('Content-Length') || 0}b sent`);
+    });
+    next();
+});
+
 //security?
 var helmet = require('helmet');
 app.use(helmet({
@@ -24,7 +38,7 @@ app.use(cors());
 //Gets port from deployment server (heroku) or uses 8080
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
-    logger.info(`App is running on port ${ PORT }`);
+    logger.info(`App is running on port ${PORT}`);
 });
 
 // #############    ACTIONS     ##############
@@ -40,6 +54,6 @@ app.get('/', (req: Request, res: Response) => {
 //Test json return
 app.get('/jsontest', (req: Request, res: Response, err: Error) => {
     return res.json({
-        "testSuccess" : true
+        "testSuccess": true
     })
 });

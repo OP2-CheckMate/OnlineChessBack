@@ -6,6 +6,21 @@ import { LOBBIES, updateLobby } from './queuing'
 import logger from "../utils/logger";
 import { Move } from '../types/types'
 
+// Log incoming requests
+games.use((req: Request, res: Response, next: Function) => {
+  logger.info(`${req.method} ${req.url}`);
+  next();
+});
+
+// Log outgoing responses
+games.use((req: Request, res: Response, next: Function) => {
+  res.on('finish', () => {
+    logger.info(`${res.statusCode} ${res.statusMessage}; ${res.get('Content-Length') || 0}b sent`);
+  });
+  next();
+});
+
+
 //Get all lobbies
 games.get('/lobbylist', (req: Request, res: Response, err: Error) => {
   logger.info('Get all lobbies');
