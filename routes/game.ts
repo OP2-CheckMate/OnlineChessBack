@@ -40,7 +40,7 @@ games.get('/lobby/:id', (req: Request, res: Response, err: Error) => {
 });
 
 // Move 1 piece
-games.post('/lobby/:id/', (req: Request, res: Response, err: Error) => {
+games.post('/lobby/:id', (req: Request, res: Response, err: Error) => {
   const { id } = req.params
   const LOBBY = LOBBIES.find(lobby => lobby.lobbyId === parseInt(id))
   const NOT_FOUND = undefined
