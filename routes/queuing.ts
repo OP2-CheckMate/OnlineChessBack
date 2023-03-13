@@ -10,7 +10,7 @@ let queue: Player[] = [] //All players looking to play
 let currentPlayerId = 0 //Current userID, distributes "guest ids"
 
 //GAMES AND LOBBIES
-export const LOBBIES: Lobby[] = [] //trying to export this to other route to see if it updates
+export const LOBBIES: Lobby[] = []
 let currentLobbyId = 1000
 
 export function updateLobby(lobbyId: number, recentMove: Move, gameOver: boolean) {
@@ -21,11 +21,9 @@ export function updateLobby(lobbyId: number, recentMove: Move, gameOver: boolean
   }
 }
 
-//xxxx/api/queuing/findgame, body: {name: "xxx"}
 //Join queue
-//###################### NOT IN USE ######################
 queuing.post('/findgame', (req: Request, res: Response, err: Error) => {
-
+//xxxx/api/queuing/findgame, body: {name: "xxx"}
   const PLAYERNAME: string = req.body.name
   const PLAYERQUEUING: Player = {
     id: currentPlayerId,
@@ -41,10 +39,9 @@ queuing.post('/findgame', (req: Request, res: Response, err: Error) => {
   return res.json(PLAYERQUEUING)
 });
 
-//xxxx/api/queuing/createlobby, body: { name: "xxx" }
 //Join queue
 queuing.post('/createlobby', (req: Request, res: Response, err: Error) => {
-
+//xxxx/api/queuing/createlobby, body: { name: "xxx" }
   const PLAYERNAME: string = req.body.name
   const PLAYER1: Player = { id: currentPlayerId, name: PLAYERNAME }
 
@@ -53,18 +50,19 @@ queuing.post('/createlobby', (req: Request, res: Response, err: Error) => {
     player1: PLAYER1,
     isGameOver: false
   }
+  
   logger.info(`Creating lobby with id ${currentLobbyId}...`);
+  
   LOBBIES.push(LOBBY)
   currentLobbyId++
   currentPlayerId++
-
+  
   return res.json(LOBBY)
 });
 
-//xxxx/api/queuing/joinlobby, body: { lobbyId: 0000, name: "xxx" }
 //JOIN already created lobby
 queuing.post('/joinlobby', (req: Request, res: Response, err: Error) => {
-
+//xxxx/api/queuing/joinlobby, body: { lobbyId: 0000, name: "xxx" }
   const PLAYERNAME: string = req.body.name
   const LOBBYID: number = req.body.lobbyId
 
