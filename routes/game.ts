@@ -43,21 +43,25 @@ games.get('/lobby/:id', (req: Request, res: Response, err: Error) => {
 games.post('/lobby/:id/', (req: Request, res: Response, err: Error) => {
   const { id } = req.params
   const LOBBY = LOBBIES.find(lobby => lobby.lobbyId === parseInt(id))
-  if (LOBBY === undefined) {
+  const NOT_FOUND = undefined
+  
+  if (LOBBY === NOT_FOUND) {
     logger.error(`Lobby not found for id ${id}`);
     return res.json({ message: 'lobby not found' });
-  } else {
-    if (req.body && req.body.recentMove !== undefined) {
-      const move: Move = req.body.recentMove;
-      const gameOver: boolean = req.body.isGameOver;
-      updateLobby(parseInt(id), move, gameOver);
-    } else {
-      logger.error(`Move not found for id ${id}`)
-      return res.json({ message: 'move not found' })
-    }
-    logger.info(`Moved 1 piece for lobby id ${id}`);
-    return res.json(LOBBY);
   }
+
+  //Validate request body and update lobby to include move
+  if (req.body && req.body.recentMove !== undefined) {
+    const move: Move = req.body.recentMove;
+    const gameOver: boolean = req.body.isGameOver;
+    updateLobby(parseInt(id), move, gameOver);
+  } else {
+    logger.error(`Move not found for id ${id}`)
+    return res.json({ message: 'move not found' })
+  }
+
+  logger.info(`Moved 1 piece for lobby id ${id}`);
+  return res.json(LOBBY);
 });
 
 export default games
