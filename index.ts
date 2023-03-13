@@ -1,6 +1,3 @@
-//Simple REST service made with Express
-//For some reason API fetches for drones and pilots actually return data
-
 import { Request, Response } from "express";
 import routes from './routes/index';
 import logger from "./utils/logger";
@@ -22,7 +19,6 @@ app.use((req: Request, res: Response, next: Function) => {
     next();
 });
 
-//security?
 var helmet = require('helmet');
 app.use(helmet({
     crossOriginResourcePolicy: false
@@ -41,19 +37,9 @@ app.listen(PORT, () => {
     logger.info(`App is running on port ${PORT}`);
 });
 
-// #############    ACTIONS     ##############
-
-//use routes FOLDER with prefix /api
+//use endpoints from routes folder with prefix /api
 app.use('/api', routes)
 
-//Index
 app.get('/', (req: Request, res: Response) => {
     res.send('Express + TypeScript Server for online mobile chess');
-});
-
-//Test json return
-app.get('/jsontest', (req: Request, res: Response, err: Error) => {
-    return res.json({
-        "testSuccess": true
-    })
 });
