@@ -2,8 +2,18 @@ import { Request, Response } from "express";
 import routes from './routes/index';
 import logger from "./utils/logger";
 
+//Gets port from deployment server (heroku) or uses 8080
+const PORT = process.env.PORT || 8080;
+
 const express = require('express');
 const app = express();
+const http = require('http');
+const server = http.createServer(app);
+/*
+const { Server } = require("socket.io");
+const io = new Server(server);
+
+// */
 
 // Log incoming requests
 app.use((req: Request, res: Response, next: Function) => {
@@ -13,10 +23,12 @@ app.use((req: Request, res: Response, next: Function) => {
 
 // Log outgoing responses
 app.use((req: Request, res: Response, next: Function) => {
+    /*
     res.on('finish', () => {
         logger.info(`${res.statusCode} ${res.statusMessage}; ${res.get('Content-Length') || 0}b sent`);
     });
     next();
+    */
 });
 
 var helmet = require('helmet');
@@ -31,8 +43,7 @@ app.use(express.urlencoded({
 const cors = require('cors');
 app.use(cors());
 
-//Gets port from deployment server (heroku) or uses 8080
-const PORT = process.env.PORT || 8080;
+
 app.listen(PORT, () => {
     logger.info(`App is running on port ${PORT}`);
 });
@@ -43,3 +54,12 @@ app.use('/api', routes)
 app.get('/', (req: Request, res: Response) => {
     res.send('Express + TypeScript Server for online mobile chess');
 });
+
+
+/*
+//Socket.io
+io.on('connection', (socket: any) => {
+    console.log('a user connected');
+});
+
+//*/

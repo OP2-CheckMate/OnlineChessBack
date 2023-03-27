@@ -15,3 +15,8 @@ export interface Move {
   from: string,
   to: string,
 }
+
+export interface OneMove {
+  recentMove: Move;
+  gameOver: boolean;
+}
