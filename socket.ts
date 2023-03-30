@@ -60,7 +60,12 @@ io.on('connection', (socket:any) => {
   })
 
   socket.on('updateGame', (roomId: string, game: any) => {
-    socket.to(roomId).emit('gameUpdate', game)
+    Promise.resolve(io.in(roomId).fetchSockets()).then(res => {
+      //console.log(res[0].id, socket.id)
+      const opponent = res.find((mover: any) => mover.id != socket.id)
+      io.to(opponent.id).emit('gameUpdate', game)
+    })
+    //socket.to(roomId).emit('gameUpdate', game)
   })
 });
 
