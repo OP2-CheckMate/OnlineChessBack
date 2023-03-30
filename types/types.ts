@@ -9,6 +9,7 @@ export interface Lobby {
   player2?: Player;
   recentMove?: Move;
   isGameOver: boolean;
+  movedBy?: 'b' | 'w';
 }
 
 export interface Move {
@@ -19,4 +20,5 @@ export interface Move {
 export interface OneMove {
   recentMove: Move;
   gameOver: boolean;
+  movedBy: 'b' | 'w';
 }

@@ -46,11 +46,21 @@ io.on('connection', (socket:any) => {
     io.to(socket.id).emit('returnLobby', result)
   })
 
-  socket.on('movePiece', (id: string, body: OneMove) => {
-    const result = movePiece(id, body)
-    if(result.lobbyId > 0){
-      socket.to(result.lobbyId).emit('pieceMoved', result)
-    }
+  socket.on('movePiece', (roomId: string, body: OneMove) => {
+    //console.log(io.in(id).fetchSockets())
+    console.log(body)
+    Promise.resolve(io.in(roomId).fetchSockets()).then(res => {
+      console.log(res[0].id, socket.id)
+      const opponent = res.find((mover: any) => mover.id != socket.id)
+      const result = movePiece(roomId, body)
+      if(result.lobbyId > 0){
+        io.to(opponent.id).emit('pieceMoved', result)
+      }
+    })
+  })
+
+  socket.on('updateGame', (roomId: string, game: any) => {
+    socket.to(roomId).emit('gameUpdate', game)
   })
 });
 
