@@ -17,7 +17,7 @@ io.on('connection', (socket:any) => {
   console.log(socket.rooms);
 
   socket.on('createLobby', (playerName:string) => {
-    const result = createlobby(playerName)
+    const result = createlobby(playerName, socket.id)
     io.to(socket.id).emit('createdLobby', result)
   })
 
@@ -26,7 +26,7 @@ io.on('connection', (socket:any) => {
   })
   
   socket.on('joinlobby', (lobbyId: number, name: string) => {
-    const result = joinlobby(lobbyId, name)
+    const result = joinlobby(lobbyId, name, socket.id)
     const lobbyNotFound = 0
     if (result.lobbyId === lobbyNotFound){
     }else{
@@ -46,27 +46,10 @@ io.on('connection', (socket:any) => {
     io.to(socket.id).emit('returnLobby', result)
   })
 
-  socket.on('movePiece', (roomId: string, body: OneMove) => {
-    //console.log(io.in(id).fetchSockets())
-    console.log(body)
-    Promise.resolve(io.in(roomId).fetchSockets()).then(res => {
-      console.log(res[0].id, socket.id)
-      const opponent = res.find((mover: any) => mover.id != socket.id)
-      const result = movePiece(roomId, body)
-      if(result.lobbyId > 0){
-        io.to(opponent.id).emit('pieceMoved', result)
-      }
-    })
+  socket.on('updateGame', (game: any, opponentId: string) => {
+    io.to(opponentId).emit('gameUpdate', game)
   })
 
-  socket.on('updateGame', (roomId: string, game: any) => {
-    Promise.resolve(io.in(roomId).fetchSockets()).then(res => {
-      //console.log(res[0].id, socket.id)
-      const opponent = res.find((mover: any) => mover.id != socket.id)
-      io.to(opponent.id).emit('gameUpdate', game)
-    })
-    //socket.to(roomId).emit('gameUpdate', game)
-  })
 });
 
 

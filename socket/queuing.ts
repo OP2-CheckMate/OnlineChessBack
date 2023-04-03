@@ -16,6 +16,7 @@ export function updateLobby(lobbyId: number, recentMove: Move, gameOver: boolean
     lobby.isGameOver = gameOver;
   }
 }
+
 /*
 
 //Join queue
@@ -38,9 +39,9 @@ queuing.post('/findgame', (req: Request, res: Response, err: Error) => {
 */
 
 /** endpoint /createlobby for socket */
-export const createlobby = (name: string) => {
+export const createlobby = (name: string, playerid: string) => {
     const PLAYERNAME: string = name
-    const PLAYER1: Player = { id: currentPlayerId, name: PLAYERNAME }
+    const PLAYER1: Player = { id: playerid, name: PLAYERNAME }
 
     const LOBBY: Lobby = {
         lobbyId: currentLobbyId,
@@ -58,7 +59,7 @@ export const createlobby = (name: string) => {
 }
 
 /** endpoint /joinlobby for socket */
-export const joinlobby = (lobbyId: number, name: string) => {
+export const joinlobby = (lobbyId: number, name: string, playerid: string) => {
     const PLAYERNAME: string = name
     const LOBBYID: number = lobbyId
 
@@ -66,7 +67,7 @@ export const joinlobby = (lobbyId: number, name: string) => {
     logger.info(`Finding lobby with id ${LOBBYID}...`);
     const LOBBY = LOBBIES.find((lobby) => lobby.lobbyId === LOBBYID)
     const NOT_FOUND = undefined
-    if (LOBBY != NOT_FOUND) LOBBY.player2 = { id: currentPlayerId, name: PLAYERNAME }
+    if (LOBBY != NOT_FOUND) LOBBY.player2 = { id: playerid, name: PLAYERNAME }
     else {
         logger.error(`Failed to join lobby with id ${LOBBYID}: lobby does not exist`);
         return { message: 'Lobby does not exist', lobbyId: 0 }
