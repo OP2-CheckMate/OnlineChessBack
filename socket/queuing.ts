@@ -3,7 +3,6 @@ import logger from "../utils/logger";
 
 //PLAYER HANDLING
 let queue: Player[] = [] //All players looking to play
-let currentPlayerId = 0 //Current userID, distributes "guest ids"
 
 //GAMES AND LOBBIES
 export const LOBBIES: Lobby[] = []
@@ -17,31 +16,30 @@ export function updateLobby(lobbyId: number, recentMove: Move, gameOver: boolean
   }
 }
 
-/*
-
 //Join queue
-queuing.post('/findgame', (req: Request, res: Response, err: Error) => {
-//xxxx/api/queuing/findgame, body: {name: "xxx"}
-  const PLAYERNAME: string = req.body.name
-  const PLAYERQUEUING: Player = {
-    id: currentPlayerId,
-    name: PLAYERNAME
+export const joinqueue = (name: string, playerId: string) => {
+  const player: Player = {id: playerId, name: name }
+  queue.push(player)
+  return true //Successfully queued
+}
+
+export const checkQueue = () => {
+  if(queue.length >= 2){
+    const players = queue.splice(0,2)
+    const lobby: Lobby = {
+      lobbyId: currentLobbyId,
+      player1: players[0],
+      player2: players[1],
+      isGameOver: false
+    }
+    return lobby
   }
-
-  queue.push(PLAYERQUEUING)
-  currentPlayerId++
-
-  logger.info('QUEUE:')
-  console.table(queue)
-
-  return res.json(PLAYERQUEUING)
-});
-*/
+}
 
 /** endpoint /createlobby for socket */
-export const createlobby = (name: string, playerid: string) => {
+export const createlobby = (name: string, playerId: string) => {
     const PLAYERNAME: string = name
-    const PLAYER1: Player = { id: playerid, name: PLAYERNAME }
+    const PLAYER1: Player = { id: playerId, name: PLAYERNAME }
 
     const LOBBY: Lobby = {
         lobbyId: currentLobbyId,
@@ -53,13 +51,12 @@ export const createlobby = (name: string, playerid: string) => {
     
     LOBBIES.push(LOBBY)
     currentLobbyId++
-    currentPlayerId++
     
     return LOBBY
 }
 
 /** endpoint /joinlobby for socket */
-export const joinlobby = (lobbyId: number, name: string, playerid: string) => {
+export const joinlobby = (lobbyId: number, name: string, playerId: string) => {
     const PLAYERNAME: string = name
     const LOBBYID: number = lobbyId
 
@@ -67,7 +64,7 @@ export const joinlobby = (lobbyId: number, name: string, playerid: string) => {
     logger.info(`Finding lobby with id ${LOBBYID}...`);
     const LOBBY = LOBBIES.find((lobby) => lobby.lobbyId === LOBBYID)
     const NOT_FOUND = undefined
-    if (LOBBY != NOT_FOUND) LOBBY.player2 = { id: playerid, name: PLAYERNAME }
+    if (LOBBY != NOT_FOUND) LOBBY.player2 = { id: playerId, name: PLAYERNAME }
     else {
         logger.error(`Failed to join lobby with id ${LOBBYID}: lobby does not exist`);
         return { message: 'Lobby does not exist', lobbyId: 0 }

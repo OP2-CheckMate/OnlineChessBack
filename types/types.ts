@@ -5,10 +5,10 @@ export interface Player {
 
 export interface Lobby {
   lobbyId: number;
-  player1: Player;
+  player1?: Player;
   player2?: Player;
   recentMove?: Move;
-  isGameOver: boolean;
+  isGameOver?: boolean;
   movedBy?: 'b' | 'w';
 }
 

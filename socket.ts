@@ -1,6 +1,6 @@
 import { getLobbies, getLobby, movePiece } from "./socket/game";
-import { createlobby, joinlobby } from "./socket/queuing";
-import { OneMove } from "./types/types";
+import { checkQueue, createlobby, joinlobby, joinqueue } from "./socket/queuing";
+import { Lobby, OneMove } from "./types/types";
 
 const express = require('express');
 const app = express();
@@ -48,6 +48,15 @@ io.on('connection', (socket:any) => {
 
   socket.on('updateGame', (game: any, opponentId: string) => {
     io.to(opponentId).emit('gameUpdate', game)
+  })
+
+  socket.on('joinqueue', (playerName:string) => {
+    if (joinqueue(playerName, socket.id)){
+      const lobby: Lobby = checkQueue() || {lobbyId: 0}
+      if (lobby.lobbyId !== 0){
+        io.to(lobby.player1?.id, lobby.player2?.id).emit('gamefound', lobby)
+      }
+    }
   })
 
 });
