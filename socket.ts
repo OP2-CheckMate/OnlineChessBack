@@ -19,6 +19,8 @@ const io = require("socket.io")(server, {
     methods: ["GET", "POST"]
   }
 });
+// const { Server } = require('socket.io')
+// const io = new Server(server)
 
 app.get('/', (req: Request, res: Response) => {
   return res.json()
