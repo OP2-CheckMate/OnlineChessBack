@@ -19,7 +19,11 @@ export function updateLobby(lobbyId: number, recentMove: Move, gameOver: boolean
 //Join queue
 export const joinqueue = (name: string, playerId: string) => {
   const player: Player = {id: playerId, name: name }
-  queue.push(player)
+  const duplicate = queue.find(e => e.id === playerId)
+  if(!duplicate){
+    queue.push(player)
+  }
+  console.log(queue)
   return true //Successfully queued
 }
 
@@ -32,7 +36,15 @@ export const checkQueue = () => {
       player2: players[1],
       isGameOver: false
     }
+    currentLobbyId++
     return lobby
+  }
+}
+
+export const leaveQueue = (playerId: string) => {
+  const foundPlayer = queue.find(e => e.id = playerId)
+  if (foundPlayer) {
+    queue.splice(queue.indexOf(foundPlayer), 1)
   }
 }
 
