@@ -79,7 +79,8 @@ io.on('connection', (socket: any) => {
     'chat-message',
     (msg: string, lobbyId: number, playerColor: string) => {
       /* const lobby = getLobby(id) */
-      socket.to(lobbyId).emit('chat-message', msg)
+      const author = socket.id
+      socket.to(lobbyId).emit('chat-message', msg, author)
     }
   )
 
