@@ -12,8 +12,15 @@ const express = require('express')
 const app = express()
 const http = require('http')
 const server = http.createServer(app)
-const { Server } = require('socket.io')
-const io = new Server(server)
+// cors handling for socket to test application on expo web
+const io = require("socket.io")(server, {
+  cors: {
+    origin: "http://localhost:19006",
+    methods: ["GET", "POST"]
+  }
+});
+// const { Server } = require('socket.io')
+// const io = new Server(server)
 
 app.get('/', (req: Request, res: Response) => {
   return res.json()
