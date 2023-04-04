@@ -27,8 +27,8 @@ io.on('connection', (socket: any) => {
     io.to(socket.id).emit('createdLobby', result)
   })
 
-  socket.on('joinroom', (roomId: number) => {
-    socket.join(roomId)
+  socket.on('joinroom', (roomName: string) => {
+    socket.join(roomName)
   })
 
   socket.on('joinlobby', (lobbyId: number, name: string) => {
@@ -68,9 +68,13 @@ io.on('connection', (socket: any) => {
     }
   })
 
-  socket.on('chat-message', (msg: string) => {
-    socket.broadcast.emit('chat-message', msg)
-  })
+  socket.on(
+    'chat-message',
+    (msg: string, lobbyId: number, playerColor: string) => {
+      /* const lobby = getLobby(id) */
+      socket.to(lobbyId).emit('chat-message', msg)
+    }
+  )
 
   socket.on('leaveQueue', () => {
     leaveQueue(socket.id)
