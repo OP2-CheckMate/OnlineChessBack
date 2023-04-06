@@ -41,8 +41,7 @@ io.on('connection', (socket: any) => {
   socket.on('joinlobby', (lobbyId: number, name: string) => {
     const result = joinlobby(lobbyId, name, socket.id)
     const lobbyNotFound = 0
-    if (result.lobbyId === lobbyNotFound) {
-    } else {
+    if (result.lobbyId !== lobbyNotFound) {
       socket.join(result.lobbyId)
       socket.to(result.lobbyId).emit('playerJoined', result)
       io.to(socket.id).emit('createdLobby', result)
@@ -75,10 +74,7 @@ io.on('connection', (socket: any) => {
     }
   })
 
-  socket.on(
-    'chat-message',
-    (msg: string, lobbyId: number, playerColor: string) => {
-      /* const lobby = getLobby(id) */
+  socket.on('chat-message', (msg: string, lobbyId: number) => {
       const author = socket.id
       socket.to(lobbyId).emit('chat-message', msg, author)
     }

@@ -8,6 +8,7 @@ let queue: Player[] = [] //All players looking to play
 export const LOBBIES: Lobby[] = []
 let currentLobbyId = 1000
 
+/** If changes are made for a single lobby (player 2 joins) update the lobby accordingly */
 export function updateLobby(lobbyId: number, recentMove: Move, gameOver: boolean) {
   const lobby = LOBBIES.find((lobby) => lobby.lobbyId === lobbyId);
   if (lobby) {
@@ -16,17 +17,17 @@ export function updateLobby(lobbyId: number, recentMove: Move, gameOver: boolean
   }
 }
 
-//Join queue
+/** Join server side queue for finding other players */
 export const joinqueue = (name: string, playerId: string) => {
   const player: Player = {id: playerId, name: name }
   const duplicate = queue.find(e => e.id === playerId)
   if(!duplicate){
     queue.push(player)
   }
-  console.log(queue)
-  return true //Successfully queued
+  return true //Ok
 }
 
+/** Checks if there are enough players in queue and match them against each other */
 export const checkQueue = () => {
   if(queue.length >= 2){
     const players = queue.splice(0,2)
@@ -41,6 +42,7 @@ export const checkQueue = () => {
   }
 }
 
+/** Player leaves queue and is deleted from array */
 export const leaveQueue = (playerId: string) => {
   const foundPlayer = queue.find(e => e.id = playerId)
   if (foundPlayer) {
@@ -48,7 +50,7 @@ export const leaveQueue = (playerId: string) => {
   }
 }
 
-/** endpoint /createlobby for socket */
+/** Create a new lobby/chess match and set creator as player 1 */
 export const createlobby = (name: string, playerId: string) => {
     const PLAYERNAME: string = name
     const PLAYER1: Player = { id: playerId, name: PLAYERNAME }
@@ -67,7 +69,7 @@ export const createlobby = (name: string, playerId: string) => {
     return LOBBY
 }
 
-/** endpoint /joinlobby for socket */
+/** 2nd player looking to join an existing lobby thats missing player 2 */
 export const joinlobby = (lobbyId: number, name: string, playerId: string) => {
     const PLAYERNAME: string = name
     const LOBBYID: number = lobbyId
@@ -76,10 +78,10 @@ export const joinlobby = (lobbyId: number, name: string, playerId: string) => {
     logger.info(`Finding lobby with id ${LOBBYID}...`);
     const LOBBY = LOBBIES.find((lobby) => lobby.lobbyId === LOBBYID)
     const NOT_FOUND = undefined
-    if (LOBBY != NOT_FOUND) LOBBY.player2 = { id: playerId, name: PLAYERNAME }
+    if (LOBBY != NOT_FOUND && !LOBBY.player2) LOBBY.player2 = { id: playerId, name: PLAYERNAME }
     else {
         logger.error(`Failed to join lobby with id ${LOBBYID}: lobby does not exist`);
-        return { message: 'Lobby does not exist', lobbyId: 0 }
+        return { message: 'Lobby does not exist or is full', lobbyId: 0 }
     }
 
     return LOBBY
