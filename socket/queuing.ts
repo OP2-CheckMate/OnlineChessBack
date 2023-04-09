@@ -9,7 +9,7 @@ export const LOBBIES: Lobby[] = []
 let currentLobbyId = 1000
 
 /** If changes are made for a single lobby (player 2 joins) update the lobby accordingly */
-export function updateLobby(lobbyId: number, recentMove: Move, gameOver: boolean) {
+export const updateLobby = (lobbyId: number, recentMove: Move, gameOver: boolean) => {
   const lobby = LOBBIES.find((lobby) => lobby.lobbyId === lobbyId);
   if (lobby) {
     lobby.recentMove = recentMove;
