@@ -37,6 +37,7 @@ export const checkQueue = () => {
       player2: players[1],
       isGameOver: false
     }
+    LOBBIES.push(lobby)
     currentLobbyId++
     return lobby
   }
