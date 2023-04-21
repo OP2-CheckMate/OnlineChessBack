@@ -41,3 +41,5 @@ export const movePiece = (id: string, body: OneMove) => {
     logger.info(`Moved 1 piece for lobby id ${id}`);
     return LOBBY
 }
+
+export const openBoards: { [key: number]: Set<string> } = {};

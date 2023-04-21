@@ -1,7 +1,9 @@
-import { getLobbies, getLobby, movePiece } from './socket/game'
+import { getLobbies, getLobby, movePiece, openBoards } from './socket/game'
 import {
   checkQueue,
   createlobby,
+  findLobbyIdByPlayerId,
+  findOpponentId,
   joinlobby,
   joinqueue,
   leaveQueue,
@@ -12,6 +14,7 @@ const express = require('express')
 const app = express()
 const http = require('http')
 const server = http.createServer(app)
+
 // cors handling for socket to test application on expo web
 const io = require("socket.io")(server, {
   cors: {
@@ -25,6 +28,7 @@ const io = require("socket.io")(server, {
 app.get('/', (req: Request, res: Response) => {
   return res.json()
 })
+
 
 io.on('connection', (socket: any) => {
   console.log(socket.rooms)
@@ -83,6 +87,40 @@ io.on('connection', (socket: any) => {
   socket.on('leaveQueue', () => {
     leaveQueue(socket.id)
   })
+
+  socket.on('boardOpened', (lobbyId: number) => {
+    if (!openBoards[lobbyId]) {
+      openBoards[lobbyId] = new Set();
+    }
+
+    openBoards[lobbyId].add(socket.id);
+
+    // If both players have opened the board, emit the "bothBoardsOpen" event
+    if (openBoards[lobbyId].size === 2) {
+      io.to(lobbyId).emit('bothBoardsOpen');
+    }
+  });
+  // This triggers when a player is disconnected from the server
+  socket.on('disconnect', () => {
+    const lobbyId = findLobbyIdByPlayerId(socket.id);
+    if (lobbyId) {
+      const opponentId = findOpponentId(socket.id, lobbyId);
+      if (opponentId) {
+        io.to(opponentId).emit('opponentDisconnected');
+      }
+    }
+  });
+  // Players exits the game by pressing back button
+  socket.on('playerExited', (playerId: string) => {
+    const lobbyId = findLobbyIdByPlayerId(playerId);
+    if (lobbyId) {
+      const opponentId = findOpponentId(playerId, lobbyId);
+      if (opponentId) {
+        io.to(opponentId).emit('opponentExited');
+      }
+    }
+  });
+
 })
 
 server.listen(8080, () => {
