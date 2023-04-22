@@ -2,6 +2,7 @@ import { getLobbies, getLobby, movePiece, openBoards } from './socket/game'
 import {
   checkQueue,
   createLobby,
+  deleteLobby,
   findLobbyIdByPlayerId,
   findOpponentId,
   joinlobby,
@@ -100,6 +101,7 @@ io.on('connection', (socket: any) => {
       io.to(lobbyId).emit('bothBoardsOpen');
     }
   });
+
   // This triggers when a player is disconnected from the server
   socket.on('disconnect', () => {
     const lobbyId = findLobbyIdByPlayerId(socket.id);
@@ -110,6 +112,7 @@ io.on('connection', (socket: any) => {
       }
     }
   });
+
   // Players exits the game by pressing back button
   socket.on('playerExited', (playerId: string) => {
     const lobbyId = findLobbyIdByPlayerId(playerId);
@@ -120,6 +123,11 @@ io.on('connection', (socket: any) => {
       }
     }
   });
+
+  socket.on('gameOver', (lobbyId: number) => {
+    deleteLobby(lobbyId)
+    console.log('lobby deleted')
+  })
 
 })
 

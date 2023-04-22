@@ -116,3 +116,9 @@ export const findOpponentId = (playerId: string, lobbyId: number): string | null
 
   return null;
 }
+
+export const deleteLobby = (lobbyId: number) => {
+  const lobbyToDelete = LOBBIES.find(item => item.lobbyId === lobbyId)
+  const deleteIndex = LOBBIES.indexOf(lobbyToDelete!)
+  LOBBIES.splice(deleteIndex, 1)
+}
