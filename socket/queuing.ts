@@ -18,7 +18,7 @@ export const updateLobby = (lobbyId: number, recentMove: Move, gameOver: boolean
 }
 
 /** Join server side queue for finding other players */
-export const joinqueue = (name: string, playerId: string) => {
+export const joinQueue = (name: string, playerId: string) => {
   const player: Player = { id: playerId, name: name }
   const duplicate = queue.find(e => e.id === playerId)
   if (!duplicate) {
@@ -52,11 +52,11 @@ export const leaveQueue = (playerId: string) => {
 }
 
 /** Create a new lobby/chess match and set creator as player 1 */
-export const createlobby = (name: string, playerId: string) => {
+export const createLobby = (name: string, playerId: string) => {
   const PLAYERNAME: string = name
   const PLAYER1: Player = { id: playerId, name: PLAYERNAME }
 
-  const LOBBY: Lobby = {
+  const lobby: Lobby = {
     lobbyId: currentLobbyId,
     player1: PLAYER1,
     isGameOver: false
@@ -64,10 +64,10 @@ export const createlobby = (name: string, playerId: string) => {
 
   logger.info(`Creating lobby with id ${currentLobbyId}...`);
 
-  LOBBIES.push(LOBBY)
+  LOBBIES.push(lobby)
   currentLobbyId++
 
-  return LOBBY
+  return lobby
 }
 
 /** 2nd player looking to join an existing lobby thats missing player 2 */
@@ -77,15 +77,15 @@ export const joinlobby = (lobbyId: number, name: string, playerId: string) => {
 
   //Find correct lobby based on id
   logger.info(`Finding lobby with id ${LOBBYID}...`);
-  const LOBBY = LOBBIES.find((lobby) => lobby.lobbyId === LOBBYID)
+  const lobby = LOBBIES.find((lobby) => lobby.lobbyId === LOBBYID)
   const NOT_FOUND = undefined
-  if (LOBBY != NOT_FOUND && !LOBBY.player2) LOBBY.player2 = { id: playerId, name: PLAYERNAME }
+  if (lobby != NOT_FOUND && !lobby.player2) lobby.player2 = { id: playerId, name: PLAYERNAME }
   else {
     logger.error(`Failed to join lobby with id ${LOBBYID}: lobby does not exist`);
     return { message: 'Lobby does not exist or is full', lobbyId: 0 }
   }
 
-  return LOBBY
+  return lobby
 }
 
  // Find the lobbyId for the given playerId (returns null if not found)

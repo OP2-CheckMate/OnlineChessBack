@@ -9,7 +9,7 @@ export const getLobbies = () => {
 
 /** GET /api/games/lobby/:id SOCKET.IO */
 export const getLobby = (id: string) => {
-    let LOBBY = LOBBIES.find(lobby => lobby.lobbyId === parseInt(id))
+    const LOBBY = LOBBIES.find(lobby => lobby.lobbyId === parseInt(id))
     if (LOBBY === undefined) {
       logger.error(`Lobby not found for id ${id}`);
       return { message: 'lobby not found', lobbyId: 0 }

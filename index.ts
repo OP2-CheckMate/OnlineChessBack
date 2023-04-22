@@ -1,65 +1,128 @@
-import { Request, Response } from "express";
-import routes from './routes/index';
-import logger from "./utils/logger";
+import { getLobbies, getLobby, movePiece, openBoards } from './socket/game'
+import {
+  checkQueue,
+  createLobby,
+  findLobbyIdByPlayerId,
+  findOpponentId,
+  joinlobby,
+  joinQueue,
+  leaveQueue,
+} from './socket/queuing'
+import { Lobby, OneMove } from './types/types'
 
-//Gets port from deployment server (heroku) or uses 8080
-const PORT = process.env.PORT || 8080;
+const express = require('express')
+const app = express()
+const http = require('http')
+const server = http.createServer(app)
 
-const express = require('express');
-const app = express();
-const http = require('http');
-const server = http.createServer(app);
-/*
-const { Server } = require("socket.io");
-const io = new Server(server);
-
-// */
-
-// Log incoming requests
-app.use((req: Request, res: Response, next: Function) => {
-    logger.info(`${req.method} ${req.url}`);
-    next();
+// cors handling for socket to test application on expo web
+const io = require("socket.io")(server, {
+  cors: {
+    origin: "http://localhost:19006",
+    methods: ["GET", "POST"]
+  }
 });
-
-// Log outgoing responses
-app.use((req: Request, res: Response, next: Function) => {
-    /*
-    res.on('finish', () => {
-        logger.info(`${res.statusCode} ${res.statusMessage}; ${res.get('Content-Length') || 0}b sent`);
-    });
-    next();
-    */
-});
-
-var helmet = require('helmet');
-app.use(helmet({
-    crossOriginResourcePolicy: false
-}));
-app.use(express.json());
-app.use(express.urlencoded({
-    limit: '5mb',
-    extended: true
-}));
-const cors = require('cors');
-app.use(cors());
-
-
-app.listen(PORT, () => {
-    logger.info(`App is running on port ${PORT}`);
-});
-
-//use endpoints from routes folder with prefix /api
-app.use('/api', routes)
+// const { Server } = require('socket.io')
+// const io = new Server(server)
 
 app.get('/', (req: Request, res: Response) => {
-    res.send('Express + TypeScript Server for online mobile chess');
-});
+  return res.json()
+})
 
 
-/*
-//Socket.io
 io.on('connection', (socket: any) => {
-    console.log('a user connected');
-});
+  console.log(socket.rooms)
 
-//*/
+  socket.on('createLobby', (playerName: string) => {
+    const result = createLobby(playerName, socket.id)
+    io.to(socket.id).emit('createdLobby', result)
+  })
+
+  socket.on('joinroom', (roomName: string) => {
+    socket.join(roomName)
+  })
+
+  socket.on('joinlobby', (lobbyId: number, name: string) => {
+    const result = joinlobby(lobbyId, name, socket.id)
+    const lobbyNotFound = 0
+    if (result.lobbyId !== lobbyNotFound) {
+      socket.join(result.lobbyId)
+      socket.to(result.lobbyId).emit('playerJoined', result)
+      io.to(socket.id).emit('createdLobby', result)
+    }
+  })
+
+  socket.on('getLobbies', () => {
+    const result = getLobbies()
+    io.to(socket.id).emit('returnLobbies', result)
+  })
+
+  socket.on('getLobby', (id: string) => {
+    const result = getLobby(id)
+    io.to(socket.id).emit('returnLobby', result)
+  })
+
+  socket.on('updateGame', (game: any, opponentId: string) => {
+    io.to(opponentId).emit('gameUpdate', game)
+  })
+
+  socket.on('joinqueue', (playerName: string) => {
+    if (joinQueue(playerName, socket.id)) {
+      const lobby: Lobby = checkQueue() || { lobbyId: 0 }
+      if (lobby.lobbyId !== 0) {
+        io.to(lobby.player1?.id).emit('gamefound', lobby)
+        io.to(lobby.player2?.id).emit('gamefound', lobby)
+      } else {
+        io.to(socket.id).emit('joinedQueue')
+      }
+    }
+  })
+
+  socket.on('chat-message', (msg: string, lobbyId: number) => {
+      const author = socket.id
+      socket.to(lobbyId).emit('chat-message', msg, author)
+    }
+  )
+
+  socket.on('leaveQueue', () => {
+    leaveQueue(socket.id)
+  })
+
+  socket.on('boardOpened', (lobbyId: number) => {
+    if (!openBoards[lobbyId]) {
+      openBoards[lobbyId] = new Set();
+    }
+
+    openBoards[lobbyId].add(socket.id);
+
+    // If both players have opened the board, emit the "bothBoardsOpen" event
+    if (openBoards[lobbyId].size === 2) {
+      io.to(lobbyId).emit('bothBoardsOpen');
+    }
+  });
+  // This triggers when a player is disconnected from the server
+  socket.on('disconnect', () => {
+    const lobbyId = findLobbyIdByPlayerId(socket.id);
+    if (lobbyId) {
+      const opponentId = findOpponentId(socket.id, lobbyId);
+      if (opponentId) {
+        io.to(opponentId).emit('opponentDisconnected');
+      }
+    }
+  });
+  // Players exits the game by pressing back button
+  socket.on('playerExited', (playerId: string) => {
+    const lobbyId = findLobbyIdByPlayerId(playerId);
+    if (lobbyId) {
+      const opponentId = findOpponentId(playerId, lobbyId);
+      if (opponentId) {
+        io.to(opponentId).emit('opponentExited');
+      }
+    }
+  });
+
+})
+
+server.listen(8080, () => {
+  console.log('listening on *:8080')
+})
