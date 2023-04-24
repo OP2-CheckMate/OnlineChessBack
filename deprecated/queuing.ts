@@ -23,10 +23,10 @@ export function updateLobby(lobbyId: number, recentMove: Move, gameOver: boolean
 
 //Join queue
 queuing.post('/findgame', (req: Request, res: Response, err: Error) => {
-//xxxx/api/queuing/findgame, body: {name: "xxx"}
+  //xxxx/api/queuing/findgame, body: {name: "xxx"}
   const PLAYERNAME: string = req.body.name
   const PLAYERQUEUING: Player = {
-    id: currentPlayerId,
+    id: currentPlayerId.toString(),
     name: PLAYERNAME
   }
 
@@ -41,28 +41,28 @@ queuing.post('/findgame', (req: Request, res: Response, err: Error) => {
 
 //Join queue
 queuing.post('/createlobby', (req: Request, res: Response, err: Error) => {
-//xxxx/api/queuing/createlobby, body: { name: "xxx" }
+  //xxxx/api/queuing/createlobby, body: { name: "xxx" }
   const PLAYERNAME: string = req.body.name
-  const PLAYER1: Player = { id: currentPlayerId, name: PLAYERNAME }
+  const PLAYER1: Player = { id: currentPlayerId.toString(), name: PLAYERNAME }
 
   const LOBBY: Lobby = {
     lobbyId: currentLobbyId,
     player1: PLAYER1,
     isGameOver: false
   }
-  
+
   logger.info(`Creating lobby with id ${currentLobbyId}...`);
-  
+
   LOBBIES.push(LOBBY)
   currentLobbyId++
   currentPlayerId++
-  
+
   return res.json(LOBBY)
 });
 
 //JOIN already created lobby
 queuing.post('/joinlobby', (req: Request, res: Response, err: Error) => {
-//xxxx/api/queuing/joinlobby, body: { lobbyId: 0000, name: "xxx" }
+  //xxxx/api/queuing/joinlobby, body: { lobbyId: 0000, name: "xxx" }
   const PLAYERNAME: string = req.body.name
   const LOBBYID: number = req.body.lobbyId
 
@@ -70,7 +70,7 @@ queuing.post('/joinlobby', (req: Request, res: Response, err: Error) => {
   logger.info(`Finding lobby with id ${LOBBYID}...`);
   const LOBBY = LOBBIES.find((lobby) => lobby.lobbyId === LOBBYID)
   const NOT_FOUND = undefined
-  if (LOBBY != NOT_FOUND) LOBBY.player2 = { id: currentPlayerId, name: PLAYERNAME }
+  if (LOBBY != NOT_FOUND) LOBBY.player2 = { id: currentPlayerId.toString(), name: PLAYERNAME }
   else {
     logger.error(`Failed to join lobby with id ${LOBBYID}: lobby does not exist`);
     return res.status(400).json({ message: 'Lobby does not exist' })
