@@ -15,6 +15,8 @@ const express = require('express')
 const app = express()
 const http = require('http')
 const server = http.createServer(app)
+//Gets port from deployment server (heroku) or uses 8080
+const PORT = process.env.PORT || 8080;
 
 // cors handling for socket to test application on expo web
 const io = require("socket.io")(server, {
@@ -80,9 +82,9 @@ io.on('connection', (socket: any) => {
   })
 
   socket.on('chat-message', (msg: string, lobbyId: number) => {
-      const author = socket.id
-      socket.to(lobbyId).emit('chat-message', msg, author)
-    }
+    const author = socket.id
+    socket.to(lobbyId).emit('chat-message', msg, author)
+  }
   )
 
   socket.on('leaveQueue', () => {
@@ -131,6 +133,6 @@ io.on('connection', (socket: any) => {
 
 })
 
-server.listen(8080, () => {
-  console.log('listening on *:8080')
+server.listen(PORT, () => {
+  console.log(`listening on *:${PORT}`)
 })
