@@ -10,6 +10,7 @@ export interface Lobby {
   recentMove?: Move;
   isGameOver?: boolean;
   movedBy?: 'b' | 'w';
+  timestamp?: Date;
 }
 
 export interface Move {

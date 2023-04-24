@@ -59,7 +59,8 @@ export const createLobby = (name: string, playerId: string) => {
   const lobby: Lobby = {
     lobbyId: currentLobbyId,
     player1: PLAYER1,
-    isGameOver: false
+    isGameOver: false,
+    timestamp: new Date()
   }
 
   logger.info(`Creating lobby with id ${currentLobbyId}...`);
@@ -121,4 +122,21 @@ export const deleteLobby = (lobbyId: number) => {
   const lobbyToDelete = LOBBIES.find(item => item.lobbyId === lobbyId)
   const deleteIndex = LOBBIES.indexOf(lobbyToDelete!)
   LOBBIES.splice(deleteIndex, 1)
+}
+
+export const updateTimestamp = (lobbyId: number) => {
+  const lobby = LOBBIES.find(lobby => lobby.lobbyId === lobbyId)
+  lobby!.timestamp = new Date()
+}
+
+export const findLobbyAfterReconnect = (id: string) => {
+  const timestamp = new Date()
+  const lobby = LOBBIES.find(lobby => {
+    if(lobby.player1?.id === id || lobby.player2?.id === id){
+      if(lobby.timestamp?.getTime() && timestamp.getTime() - lobby.timestamp?.getTime() < 60000){
+        return lobby
+      }
+    }
+  })
+  return lobby
 }

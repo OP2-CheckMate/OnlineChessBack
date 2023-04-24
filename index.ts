@@ -3,11 +3,13 @@ import {
   checkQueue,
   createLobby,
   deleteLobby,
+  findLobbyAfterReconnect,
   findLobbyIdByPlayerId,
   findOpponentId,
   joinlobby,
   joinQueue,
   leaveQueue,
+  updateTimestamp,
 } from './socket/queuing'
 import { Lobby, OneMove } from './types/types'
 
@@ -33,6 +35,11 @@ app.get('/', (req: Request, res: Response) => {
 
 io.on('connection', (socket: any) => {
   console.log(socket.rooms)
+
+  const lobby = findLobbyAfterReconnect(socket.id)
+  if(lobby){
+    io.to(socket.id).emit('reconnectPossible', lobby.lobbyId)
+  }
 
   socket.on('createLobby', (playerName: string) => {
     const result = createLobby(playerName, socket.id)
@@ -107,6 +114,7 @@ io.on('connection', (socket: any) => {
     const lobbyId = findLobbyIdByPlayerId(socket.id);
     if (lobbyId) {
       const opponentId = findOpponentId(socket.id, lobbyId);
+      updateTimestamp(lobbyId)
       if (opponentId) {
         io.to(opponentId).emit('opponentDisconnected');
       }
@@ -120,6 +128,7 @@ io.on('connection', (socket: any) => {
       const opponentId = findOpponentId(playerId, lobbyId);
       if (opponentId) {
         io.to(opponentId).emit('opponentExited');
+        deleteLobby(lobbyId)
       }
     }
   });
