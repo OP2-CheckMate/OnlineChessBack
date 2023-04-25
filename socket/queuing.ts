@@ -18,8 +18,9 @@ export const updateLobby = (lobbyId: number, recentMove: Move, gameOver: boolean
 }
 
 /** Join server side queue for finding other players */
-export const joinQueue = (name: string, playerId: string) => {
-  const player: Player = { id: playerId, name: name }
+export const joinQueue = (name: string, playerId: string, socketId: string) => {
+  const player: Player = { id: playerId, socketId: socketId, name: name }
+  //console.log(player)
   const duplicate = queue.find(e => e.id === playerId)
   if (!duplicate) {
     queue.push(player)
@@ -35,7 +36,8 @@ export const checkQueue = () => {
       lobbyId: currentLobbyId,
       player1: players[0],
       player2: players[1],
-      isGameOver: false
+      isGameOver: false,
+      timestamp: new Date()
     }
     LOBBIES.push(lobby)
     currentLobbyId++
@@ -52,9 +54,9 @@ export const leaveQueue = (playerId: string) => {
 }
 
 /** Create a new lobby/chess match and set creator as player 1 */
-export const createLobby = (name: string, playerId: string) => {
+export const createLobby = (name: string, playerId: string, socketId: string) => {
   const PLAYERNAME: string = name
-  const PLAYER1: Player = { id: playerId, name: PLAYERNAME }
+  const PLAYER1: Player = { id: playerId, socketId: socketId, name: PLAYERNAME }
 
   const lobby: Lobby = {
     lobbyId: currentLobbyId,
@@ -72,7 +74,7 @@ export const createLobby = (name: string, playerId: string) => {
 }
 
 /** 2nd player looking to join an existing lobby thats missing player 2 */
-export const joinlobby = (lobbyId: number, name: string, playerId: string) => {
+export const joinlobby = (lobbyId: number, name: string, playerId: string, socketId: string) => {
   const PLAYERNAME: string = name
   const LOBBYID: number = lobbyId
 
@@ -80,7 +82,7 @@ export const joinlobby = (lobbyId: number, name: string, playerId: string) => {
   logger.info(`Finding lobby with id ${LOBBYID}...`);
   const lobby = LOBBIES.find((lobby) => lobby.lobbyId === LOBBYID)
   const NOT_FOUND = undefined
-  if (lobby != NOT_FOUND && !lobby.player2) lobby.player2 = { id: playerId, name: PLAYERNAME }
+  if (lobby != NOT_FOUND && !lobby.player2) lobby.player2 = { id: playerId, socketId: socketId, name: PLAYERNAME }
   else {
     logger.error(`Failed to join lobby with id ${LOBBYID}: lobby does not exist`);
     return { message: 'Lobby does not exist or is full', lobbyId: 0 }
@@ -107,12 +109,12 @@ export const findOpponentId = (playerId: string, lobbyId: number): string | null
 
   // Check if the playerId matches player1's id, if so, return player2's id
   if (lobby.player1 && lobby.player1.id === playerId) {
-    return lobby.player2 ? lobby.player2.id : null;
+    return lobby.player2 ? lobby.player2.socketId : null;
   }
 
   // Check if the playerId matches player2's id, if so, return player1's id
   if (lobby.player2 && lobby.player2.id === playerId) {
-    return lobby.player1 ? lobby.player1.id : null;
+    return lobby.player1 ? lobby.player1.socketId : null;
   }
 
   return null;
@@ -133,6 +135,7 @@ export const findLobbyAfterReconnect = (id: string) => {
   const timestamp = new Date()
   const lobby = LOBBIES.find(lobby => {
     if(lobby.player1?.id === id || lobby.player2?.id === id){
+      console.log('findLobby function: ', lobby)
       if(lobby.timestamp?.getTime() && timestamp.getTime() - lobby.timestamp?.getTime() < 60000){
         return lobby
       }

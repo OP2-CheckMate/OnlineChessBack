@@ -37,14 +37,21 @@ app.get('/', (req: Request, res: Response) => {
 
 io.on('connection', (socket: any) => {
   console.log(socket.rooms)
+  io.to(socket.id).emit('connectionSuccessfull', socket.id)
 
-  const lobby = findLobbyAfterReconnect(socket.id)
-  if(lobby){
-    io.to(socket.id).emit('reconnectPossible', lobby.lobbyId)
-  }
+  socket.on('checkReconnect', (playerId: string)=>{
+    console.log('checking reconnection')
+    const lobby = findLobbyAfterReconnect(playerId)
+    console.log(lobby)
+    if(lobby){
+      console.log('lobby found')
+      io.to(socket.id).emit('reconnectToGame', lobby.lobbyId)
+    }
+  })
+  
 
-  socket.on('createLobby', (playerName: string) => {
-    const result = createLobby(playerName, socket.id)
+  socket.on('createLobby', (playerName: string, playerId: string) => {
+    const result = createLobby(playerName, playerId, socket.id)
     io.to(socket.id).emit('createdLobby', result)
   })
 
@@ -52,8 +59,8 @@ io.on('connection', (socket: any) => {
     socket.join(roomName)
   })
 
-  socket.on('joinlobby', (lobbyId: number, name: string) => {
-    const result = joinlobby(lobbyId, name, socket.id)
+  socket.on('joinlobby', (lobbyId: number, name: string, playerId: string) => {
+    const result = joinlobby(lobbyId, name, playerId, socket.id)
     const lobbyNotFound = 0
     if (result.lobbyId !== lobbyNotFound) {
       socket.join(result.lobbyId)
@@ -76,26 +83,27 @@ io.on('connection', (socket: any) => {
     io.to(opponentId).emit('gameUpdate', game)
   })
 
-  socket.on('joinqueue', (playerName: string) => {
-    if (joinQueue(playerName, socket.id)) {
-      const lobby: Lobby = checkQueue() || { lobbyId: 0 }
+  socket.on('joinqueue', (playerName: string, playerId: string) => {
+    if (joinQueue(playerName, playerId, socket.id)) {
+      const lobby: Lobby = checkQueue() || { lobbyId: 0, timestamp: new Date() }
+      //console.log(lobby)
       if (lobby.lobbyId !== 0) {
-        io.to(lobby.player1?.id).emit('gamefound', lobby)
-        io.to(lobby.player2?.id).emit('gamefound', lobby)
+        io.to(lobby.player1?.socketId).emit('gamefound', lobby)
+        io.to(lobby.player2?.socketId).emit('gamefound', lobby)
       } else {
         io.to(socket.id).emit('joinedQueue')
       }
     }
   })
 
-  socket.on('chat-message', (msg: string, lobbyId: number) => {
+  socket.on('chat-message', (msg: string, lobbyId: number, playerId: string) => {
     const author = socket.id
-    socket.to(lobbyId).emit('chat-message', msg, author)
+    socket.to(lobbyId).emit('chat-message', msg, playerId)
   }
   )
 
-  socket.on('leaveQueue', () => {
-    leaveQueue(socket.id)
+  socket.on('leaveQueue', (playerId: string) => {
+    leaveQueue(playerId)
   })
 
   socket.on('boardOpened', (lobbyId: number) => {
@@ -130,7 +138,7 @@ io.on('connection', (socket: any) => {
       const opponentId = findOpponentId(playerId, lobbyId);
       if (opponentId) {
         io.to(opponentId).emit('opponentExited');
-        deleteLobby(lobbyId)
+        //deleteLobby(lobbyId)
       }
     }
   });

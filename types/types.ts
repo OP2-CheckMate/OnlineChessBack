@@ -1,5 +1,6 @@
 export interface Player {
   id: string;
+  socketId: string;
   name: string;
 }
 
@@ -10,7 +11,7 @@ export interface Lobby {
   recentMove?: Move;
   isGameOver?: boolean;
   movedBy?: 'b' | 'w';
-  timestamp?: Date;
+  timestamp: Date;
 }
 
 export interface Move {
