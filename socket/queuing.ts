@@ -99,6 +99,13 @@ export const findLobbyIdByPlayerId = (playerId: string): number | null => {
   return lobby ? lobby.lobbyId : null;
 }
 
+export const findLobbyIdBySocketId = (playerId: string): number | null => {
+  const lobby = LOBBIES.find(
+    (lobby) => (lobby.player1 && lobby.player1.socketId === playerId) || (lobby.player2 && lobby.player2.socketId === playerId)
+  );
+  return lobby ? lobby.lobbyId : null;
+}
+
 // Find the opponent's id for the given playerId and lobbyId (returns null if not found)
 export const findOpponentId = (playerId: string, lobbyId: number): string | null => {
   const lobby = LOBBIES.find((lobby) => lobby.lobbyId === lobbyId);
@@ -142,4 +149,10 @@ export const findLobbyAfterReconnect = (id: string) => {
     }
   })
   return lobby
+}
+
+export const findPlayerIdBySocket = (id: string, lobbyId: number) => {
+  const lobby = LOBBIES.find(lobby => lobby.lobbyId === lobbyId)
+  if (lobby?.player1?.socketId === id) return lobby.player1.id
+  return lobby?.player2!.id
 }
