@@ -26,7 +26,7 @@ For logging the server uses Winston logger.
 |``'playerExited'`` | Notify the other player if the opponent exits the game |
 |``'gameOver'`` | Deletes the lobby when game is over |
 
-## Run the app
+## Run the server
 ### Clone it
 ``git clone https://github.com/OP2-CheckMate/OnlineChessBack.git``
 ### Install npm packages:
