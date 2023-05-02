@@ -41,30 +41,18 @@ io.on('connection', (socket: any) => {
   console.log(socket.rooms)
   io.to(socket.id).emit('connectionSuccessfull', socket.id)
 
-<<<<<<< HEAD
   socket.on('checkReconnect', (playerId: string) => {
-    console.log('checking reconnection')
-    const lobby = findLobbyAfterReconnect(playerId)
-    console.log(lobby)
-    if (lobby) {
-      console.log('lobby found')
-      io.to(socket.id).emit('reconnectToGame', lobby.lobbyId)
-    }
-  })
-
-=======
-  socket.on('checkReconnect', (playerId: string)=>{
     //console.log('checking reconnection')
     const lobby = findLobbyAfterReconnect(playerId)
     //console.log(lobby)
-    if(lobby){
+    if (lobby) {
       //console.log('lobby found')
       const opponent = lobby.player1?.id == playerId ? lobby.player2?.socketId : lobby.player1?.socketId
 
       io.to(socket.id).emit('reconnectToGame', lobby, opponent)
     }
   })
-  
+
   socket.on('boardData', (board: any, opponentId: string) => {
     io.to(opponentId).emit('lobbyData', board)
   })
@@ -72,7 +60,6 @@ io.on('connection', (socket: any) => {
   socket.on('reconnectRequest', (opponentId: string) => {
     io.to(opponentId).emit('reconnectRequest', socket.id)
   })
->>>>>>> 605f1464e5622ede888ee063bd4fa9264d4eaa90
 
   socket.on('createLobby', (playerName: string, playerId: string) => {
     const result = createLobby(playerName, playerId, socket.id)
@@ -146,7 +133,7 @@ io.on('connection', (socket: any) => {
   socket.on('disconnect', () => {
     console.log('dc')
     const lobbyId = findLobbyIdBySocketId(socket.id);
-    
+
     if (lobbyId) {
       const playerId = findPlayerIdBySocket(socket.id, lobbyId)
       const opponentId = findOpponentId(playerId!, lobbyId);
@@ -175,7 +162,7 @@ io.on('connection', (socket: any) => {
   })
 
   socket.on('reconnecting', () => {
-    
+
   })
 
 })
