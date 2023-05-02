@@ -28,12 +28,22 @@ For logging the server uses Winston logger.
 
 ## Run the app
 ### Clone it
-``git clone https://github.com/OP2-CheckMate/OnlineChessBack.git``
+```sh
+git clone https://github.com/OP2-CheckMate/OnlineChessBack.git
+```
 ### Install npm packages:
-``npm install``
+```sh
+npm install
+```
 ### Run development version that refreshes when changes are made
-``npm run dev``
+```sh
+npm run dev
+```
 ### If command above doesnt start server, it still should compile into dist/index.js -> to run that:
-``npm start``
+```sh
+npm start
+```
 ### Stop program:
-``ctrl + c``
+```sh
+ctrl + c
+```
