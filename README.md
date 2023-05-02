@@ -10,6 +10,9 @@ For logging the server uses Winston logger.
 | Endpoint | Use |
 | -------- | --- |
 | ``'connection'`` | Connect player to backend when application is opened |
+| ``'checkReconnect'`` | Check if player has a game going on |
+| ``'boardData'`` | Send board data to reconnected player |
+| ``'reconnectRequst'`` | Player wants to reconnect to game |
 | ``'createLobby'`` | Creates a new lobby |
 |``'joinroom'`` | Join room inside socket |
 |``'joinlobby'`` | Takes lobbyId as parameter and tries to find and connect player to that lobby |
