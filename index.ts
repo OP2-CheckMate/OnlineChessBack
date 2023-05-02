@@ -46,11 +46,20 @@ io.on('connection', (socket: any) => {
     const lobby = findLobbyAfterReconnect(playerId)
     //console.log(lobby)
     if(lobby){
-      console.log('lobby found')
-      io.to(socket.id).emit('reconnectToGame', lobby.lobbyId)
+      //console.log('lobby found')
+      const opponent = lobby.player1?.id == playerId ? lobby.player2?.socketId : lobby.player1?.socketId
+
+      io.to(socket.id).emit('reconnectToGame', lobby, opponent)
     }
   })
   
+  socket.on('boardData', (board: any, opponentId: string) => {
+    io.to(opponentId).emit('lobbyData', board)
+  })
+
+  socket.on('reconnectRequest', (opponentId: string) => {
+    io.to(opponentId).emit('reconnectRequest', socket.id)
+  })
 
   socket.on('createLobby', (playerName: string, playerId: string) => {
     const result = createLobby(playerName, playerId, socket.id)
@@ -151,6 +160,10 @@ io.on('connection', (socket: any) => {
   socket.on('gameOver', (lobbyId: number) => {
     deleteLobby(lobbyId)
     console.log('lobby deleted')
+  })
+
+  socket.on('reconnecting', () => {
+    
   })
 
 })
