@@ -1,4 +1,4 @@
-import { getLobbies, getLobby, movePiece, openBoards } from './socket/game'
+import { getLobbies, getLobby, openBoards } from './socket/game'
 import {
   checkQueue,
   createLobby,
@@ -11,17 +11,17 @@ import {
   leaveQueue,
   updateTimestamp,
 } from './socket/queuing'
-import { Lobby, OneMove } from './types/types'
+import { Lobby } from './types/types'
 
 const express = require('express')
 const app = express()
 const http = require('http')
 const server = http.createServer(app)
-//Gets port from deployment server (heroku) or uses 8080
+//Gets port from deployment server (render) or uses 8080
 const PORT = process.env.PORT || 8080;
 
-// cors handling for socket to test application on expo web
 const io = require("socket.io")(server, {
+  // cors handling for socket to test application on expo web
   cors: {
     origin: "http://localhost:19006",
     methods: ["GET", "POST"]
@@ -39,16 +39,16 @@ io.on('connection', (socket: any) => {
   console.log(socket.rooms)
   io.to(socket.id).emit('connectionSuccessfull', socket.id)
 
-  socket.on('checkReconnect', (playerId: string)=>{
+  socket.on('checkReconnect', (playerId: string) => {
     console.log('checking reconnection')
     const lobby = findLobbyAfterReconnect(playerId)
     console.log(lobby)
-    if(lobby){
+    if (lobby) {
       console.log('lobby found')
       io.to(socket.id).emit('reconnectToGame', lobby.lobbyId)
     }
   })
-  
+
 
   socket.on('createLobby', (playerName: string, playerId: string) => {
     const result = createLobby(playerName, playerId, socket.id)
@@ -97,7 +97,6 @@ io.on('connection', (socket: any) => {
   })
 
   socket.on('chat-message', (msg: string, lobbyId: number, playerId: string) => {
-    const author = socket.id
     socket.to(lobbyId).emit('chat-message', msg, playerId)
   }
   )

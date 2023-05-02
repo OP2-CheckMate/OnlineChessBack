@@ -1,88 +1,36 @@
 # OnlineChessBack
-Back end that connects players and redirects moves made in a chessgame (front)
-We start with trying Node and express for simplicity. The backend is built as a REST-service, and at this point, players can create a new lobby or connect to an existing one with lobby id, and while in a lobby they can play the game against an opponent and moves are updated to backend when they are done
 
-## Endpoints
-### Create new lobby
-POST /api/queuing/createlobby
-body:
+Node.js server that uses Express and Socket.io libraries to create a real-time multiplayer game server. Connects players and redirects moves made in the frontend. Frontend repository can be found [here](https://github.com/OP2-CheckMate/OnlineChessFront).
 
-    { 
-      name: "xxx"
-    }
+The server uses Express to handle HTTP requests, and Socket.io to handle real-time communication between clients and the server.
 
-### Join existing lobby
-POST /api/queuing/joinlobby
+For logging the server uses Winston logger.
 
-body: 
-
-    {
-      lobbyId: 1001,
-      name: "xxx"
-    }
-
-### Join queue - FOR FUTURE ITERATIONS
-POST /api/queuing/findgame
-
-body: 
-
-    {
-      name: "xxx"
-    }
-
-### Get all created lobbies
-GET /api/games/lobbylist
-
-### Get data for a single lobby
-GET /api/games/lobby/:id
-
-### Move 1 piece in 1 game (make 1 turn)
-POST /api/games/lobby/:id
-
-body: 
-
-    {
-      recentMove: {
-        from: "a2",
-        to: "a3"
-      },
-      gameOver: false
-    }
-    
-## Plan for future iterations
-
-### CURRENT Polling:  
-
- - Express 
-
- - Free 
-
- - Easy development 
-
- - Requires refreshing or short/long polling (bad) - Currently refreshing
-
- - Do we need DB? 
-
-### Socket.io, extends polling:  
-
- - Express 
-
- - Free 
-
- - Hard Development, new technology 
-
- - Real time 
-
- - Do we need DB? 
+## Socket Endpoints
+| Endpoint | Use |
+| -------- | --- |
+| ``'connection'`` | Connect player to backend when application is opened |
+| ``'createLobby'`` | Creates a new lobby |
+|``'joinroom'`` | Join room inside socket |
+|``'joinlobby'`` | Takes lobbyId as parameter and tries to find and connect player to that lobby |
+|``'getLobbies'`` | Returns all lobbies |
+|``'getLobby'`` | Get a single lobby data by id |
+|``'joinqueue'`` | Player can join a queue and when there are two players in queue they are connected to game |
+|``'chat-message'`` | Emits chat messages from player to chatbox |
+|``'leaveQueue'`` | Player has left from queue |
+|``'boardOpened'`` | Checks that both players have board open and emits event when they have |
+|``'disconnect'`` | Notify the other player if the opponent disconnects from the server |
+|``'playerExited'`` | Notify the other player if the opponent exits the game |
+|``'gameOver'`` | Deletes the lobby when game is over |
 
 ## Run the app
-### install packages:
-npm install
+### Clone it
+``git clone https://github.com/OP2-CheckMate/OnlineChessBack.git``
+### Install npm packages:
+``npm install``
 ### Run development version that refreshes when changes are made
-npm run dev
+``npm run dev``
 ### If command above doesnt start server, it still should compile into dist/index.js -> to run that:
-npm start
+``npm start``
 ### Stop program:
-ctrl + c
-
-y
+``ctrl + c``
