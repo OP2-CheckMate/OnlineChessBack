@@ -5,7 +5,9 @@ import {
   deleteLobby,
   findLobbyAfterReconnect,
   findLobbyIdByPlayerId,
+  findLobbyIdBySocketId,
   findOpponentId,
+  findPlayerIdBySocket,
   joinlobby,
   joinQueue,
   leaveQueue,
@@ -39,6 +41,7 @@ io.on('connection', (socket: any) => {
   console.log(socket.rooms)
   io.to(socket.id).emit('connectionSuccessfull', socket.id)
 
+<<<<<<< HEAD
   socket.on('checkReconnect', (playerId: string) => {
     console.log('checking reconnection')
     const lobby = findLobbyAfterReconnect(playerId)
@@ -49,6 +52,27 @@ io.on('connection', (socket: any) => {
     }
   })
 
+=======
+  socket.on('checkReconnect', (playerId: string)=>{
+    //console.log('checking reconnection')
+    const lobby = findLobbyAfterReconnect(playerId)
+    //console.log(lobby)
+    if(lobby){
+      //console.log('lobby found')
+      const opponent = lobby.player1?.id == playerId ? lobby.player2?.socketId : lobby.player1?.socketId
+
+      io.to(socket.id).emit('reconnectToGame', lobby, opponent)
+    }
+  })
+  
+  socket.on('boardData', (board: any, opponentId: string) => {
+    io.to(opponentId).emit('lobbyData', board)
+  })
+
+  socket.on('reconnectRequest', (opponentId: string) => {
+    io.to(opponentId).emit('reconnectRequest', socket.id)
+  })
+>>>>>>> 605f1464e5622ede888ee063bd4fa9264d4eaa90
 
   socket.on('createLobby', (playerName: string, playerId: string) => {
     const result = createLobby(playerName, playerId, socket.id)
@@ -120,9 +144,12 @@ io.on('connection', (socket: any) => {
 
   // This triggers when a player is disconnected from the server
   socket.on('disconnect', () => {
-    const lobbyId = findLobbyIdByPlayerId(socket.id);
+    console.log('dc')
+    const lobbyId = findLobbyIdBySocketId(socket.id);
+    
     if (lobbyId) {
-      const opponentId = findOpponentId(socket.id, lobbyId);
+      const playerId = findPlayerIdBySocket(socket.id, lobbyId)
+      const opponentId = findOpponentId(playerId!, lobbyId);
       updateTimestamp(lobbyId)
       if (opponentId) {
         io.to(opponentId).emit('opponentDisconnected');
@@ -137,7 +164,7 @@ io.on('connection', (socket: any) => {
       const opponentId = findOpponentId(playerId, lobbyId);
       if (opponentId) {
         io.to(opponentId).emit('opponentExited');
-        //deleteLobby(lobbyId)
+        deleteLobby(lobbyId)
       }
     }
   });
@@ -145,6 +172,10 @@ io.on('connection', (socket: any) => {
   socket.on('gameOver', (lobbyId: number) => {
     deleteLobby(lobbyId)
     console.log('lobby deleted')
+  })
+
+  socket.on('reconnecting', () => {
+    
   })
 
 })
