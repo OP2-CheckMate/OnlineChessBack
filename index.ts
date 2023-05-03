@@ -53,8 +53,8 @@ io.on('connection', (socket: any) => {
     }
   })
 
-  socket.on('boardData', (board: any, opponentId: string) => {
-    io.to(opponentId).emit('lobbyData', board)
+  socket.on('boardData', (board: any, opponentId: string, turn: string, lobby: Lobby) => {
+    io.to(opponentId).emit('lobbyData', board, turn, lobby)
   })
 
   socket.on('reconnectRequest', (opponentId: string) => {
